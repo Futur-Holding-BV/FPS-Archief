@@ -1,0 +1,42 @@
+ARCHIEF_01 — administratief archief, vijf administraties
+
+Nieuw, apart Replit-project. Niet in de repo van FPS Connect bouwen.
+
+WAT HET IS
+Een onveranderlijk archief dat de administratie doorzoekbaar en meetbaar maakt. Geen pakket voor dagelijks gebruik: er wordt niet in gewerkt, alleen in gekeken. Bedoeld voor controles, aansluitingen en het beantwoorden van vragen achteraf.
+
+WAT HET NIET IS
+Geen boekhouding. Geen invoerschermen, geen goedkeuringen, geen betaalbatches, geen btw-aangifte. Wordt daar later om gevraagd, dan is dat een apart pakket dat hierop aansluit — niet een uitbreiding hiervan.
+
+DE VIJF ADMINISTRATIES
+FPS Bouw · FPS Brandpreventie · FPS Onderhoud · FPS Bouw & Renovatie · Futur Holding. Strikt gescheiden: elke regel hoort bij precies één administratie. Naast het beeld per administratie een totaalbeeld waarin interne facturen tussen de vijf tegen elkaar wegvallen — anders telt omzet dubbel. Futur Holding staat nog nergens in Connect; die moet hier dus als nieuwe administratie worden opgevoerd.
+
+WAT ERIN GAAT — vijf soorten
+1. Verkoopfacturen: nummer, datum, administratie, klant (naam en adres zoals op de factuur), regels met omschrijving en bedrag, btw per tarief, totaal, vervaldatum.
+2. Inkoopfacturen: leverancier, factuurnummer van de leverancier, datum, bedragen, btw, en op welk project of welke kostenpost het slaat.
+3. Bankmutaties: datum, bedrag, tegenrekening, omschrijving, en van welke rekening.
+4. Uren: medewerker, datum, aantal, project, en de werkgevende BV.
+5. Loonjournaalposten: periode, administratie, en de posten zoals de loonverwerker ze aanlevert.
+
+Interne facturen tussen de vijf administraties krijgen een kenmerk, zodat ze bij consolidatie herkenbaar zijn.
+
+DOCUMENTEN OP DE NAS
+Het archief bewaart geen bestanden, alleen een verwijzing en een controlegetal (SHA-256). Bij het opvragen van een regel wordt het bestand op de NAS gecontroleerd tegen dat getal; wijkt het af, dan is dat zichtbaar. De NAS is via een leesaccount bereikbaar, zoals de back-upketen dat al doet.
+
+ONVERANDERLIJK
+Een regel die erin staat, verandert nooit meer. Geen wijzigen, geen verwijderen — ook niet door een beheerder. Een correctie is een nieuwe regel die verwijst naar de regel die hij corrigeert. Dwing dat af in de database zelf, niet alleen in de code.
+
+HERKOMST
+Per regel vastleggen waar hij vandaan komt: uit Connect, uit AccountView, of handmatig ingelezen. Plus het moment van binnenkomst. Bij een verschil moet te zien zijn welke bron wat aanleverde.
+
+WAT ERUIT KOMT
+Zoeken en optellen, meer niet: per administratie en per periode, per klant of leverancier, per project. Omzet, inkoop, uren, en de openstaande posten. Exporteerbaar naar een bestand.
+
+VOLLEDIGHEID
+Leg per soort en per administratie vast vanaf welke datum het archief compleet is, en wat er ontbreekt. Een half gevuld archief zonder die aantekening is misleidender dan geen archief.
+
+VULLEN
+Beginnen met wat er is: de gegevens uit Connect en wat uit AccountView te exporteren valt. Niets verzinnen, niets afleiden — ontbreekt een veld, dan blijft het leeg en staat dat in de volledigheidsaantekening.
+
+GRENZEN
+Geen koppeling terug naar Connect: Connect levert aan, het archief vraagt nooit iets op. Het archief mag nooit een bron zijn waar Connect uit leest — dan zijn ze weer verweven.

@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: archive
+    description: Read-only archive and append-only correction operations
 paths:
   /healthz:
     get:
@@ -24,7 +26,178 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /archive/summary:
+    get:
+      operationId: getArchiveSummary
+      tags: [archive]
+      summary: Get archive dashboard metrics
+      parameters:
+        - $ref: "#/components/parameters/Administration"
+        - $ref: "#/components/parameters/PeriodFrom"
+        - $ref: "#/components/parameters/PeriodTo"
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArchiveSummary"
+  /archive/completeness:
+    get:
+      operationId: getArchiveCompleteness
+      tags: [archive]
+      summary: Get completeness by administration and data type
+      parameters:
+        - $ref: "#/components/parameters/Administration"
+      responses:
+        "200":
+          description: Completeness matrix
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CompletenessStatus"
+  /archive/records:
+    get:
+      operationId: listArchiveRecords
+      tags: [archive]
+      summary: Search archived records
+      parameters:
+        - name: dataType
+          in: query
+          schema:
+            type: string
+            enum: [sales_invoice, purchase_invoice, bank_transaction, timesheet, payroll_journal]
+        - $ref: "#/components/parameters/Administration"
+        - name: search
+          in: query
+          schema: { type: string }
+        - $ref: "#/components/parameters/PeriodFrom"
+        - $ref: "#/components/parameters/PeriodTo"
+        - name: limit
+          in: query
+          schema: { type: number, minimum: 1, maximum: 250, default: 100 }
+      responses:
+        "200":
+          description: Matching archive records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ArchiveRecord"
+  /archive/records/{id}:
+    get:
+      operationId: getArchiveRecord
+      tags: [archive]
+      summary: View an archived record
+      parameters:
+        - $ref: "#/components/parameters/RecordId"
+      responses:
+        "200":
+          description: Archived record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArchiveRecord"
+        "404":
+          description: Record not found
+    post:
+      operationId: addArchiveCorrection
+      tags: [archive]
+      summary: Append a correction row referencing an archived record
+      parameters:
+        - $ref: "#/components/parameters/RecordId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CorrectionInput"
+      responses:
+        "201":
+          description: Correction appended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArchiveRecord"
+        "409":
+          description: Direct mutation is not permitted
+  /archive/records/{id}/document-integrity:
+    get:
+      operationId: verifyArchiveDocument
+      tags: [archive]
+      summary: Verify the referenced NAS document checksum
+      parameters:
+        - $ref: "#/components/parameters/RecordId"
+      responses:
+        "200":
+          description: Document integrity result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentIntegrity"
+  /archive/consolidation:
+    get:
+      operationId: getConsolidation
+      tags: [archive]
+      summary: Get consolidated totals and internal invoice eliminations
+      parameters:
+        - $ref: "#/components/parameters/PeriodFrom"
+        - $ref: "#/components/parameters/PeriodTo"
+      responses:
+        "200":
+          description: Consolidated view
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConsolidationView"
+  /archive/export:
+    get:
+      operationId: exportArchive
+      tags: [archive]
+      summary: Export a filtered archive result
+      parameters:
+        - name: format
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [csv, json]
+        - name: dataType
+          in: query
+          schema: { type: string }
+        - $ref: "#/components/parameters/Administration"
+        - $ref: "#/components/parameters/PeriodFrom"
+        - $ref: "#/components/parameters/PeriodTo"
+      responses:
+        "200":
+          description: Export file
+          content:
+            text/csv: { schema: { type: string } }
+            application/json: { schema: { type: array, items: { $ref: "#/components/schemas/ArchiveRecord" } } }
 components:
+  parameters:
+    RecordId:
+      name: id
+      in: path
+      required: true
+      schema: { type: number, minimum: 1 }
+    Administration:
+      name: administration
+      in: query
+      schema:
+        type: string
+        enum: [FPS Bouw, FPS Brandpreventie, FPS Onderhoud, FPS Bouw & Renovatie, Futur Holding]
+    PeriodFrom:
+      name: periodFrom
+      in: query
+      schema: { type: string, format: date }
+    PeriodTo:
+      name: periodTo
+      in: query
+      schema: { type: string, format: date }
   schemas:
     HealthStatus:
       type: object
@@ -33,4 +206,99 @@ components:
           type: string
       required:
         - status
+    Administration:
+      type: string
+      enum: [FPS Bouw, FPS Brandpreventie, FPS Onderhoud, FPS Bouw & Renovatie, Futur Holding]
+    DataType:
+      type: string
+      enum: [sales_invoice, purchase_invoice, bank_transaction, timesheet, payroll_journal]
+    Provenance:
+      type: string
+      enum: [Connect, AccountView, manual_import]
+    ArchiveRecord:
+      type: object
+      required: [id, dataType, administration, periodDate, provenance, ingestedAt, archivedAt, payload]
+      properties:
+        id: { type: number }
+        dataType: { $ref: "#/components/schemas/DataType" }
+        administration: { $ref: "#/components/schemas/Administration" }
+        periodDate: { type: string, format: date }
+        provenance: { $ref: "#/components/schemas/Provenance" }
+        ingestedAt: { type: string, format: date-time }
+        archivedAt: { type: string, format: date-time }
+        payload: { type: object, additionalProperties: true }
+        documentReference: { type: ["string", "null"] }
+        storedChecksum: { type: ["string", "null"] }
+        isInternal: { type: boolean }
+        correctionOfId: { type: ["number", "null"] }
+        omissionNotes: { type: ["string", "null"] }
+    CorrectionInput:
+      type: object
+      required: [dataType, administration, periodDate, provenance, payload, omissionNotes]
+      properties:
+        dataType: { $ref: "#/components/schemas/DataType" }
+        administration: { $ref: "#/components/schemas/Administration" }
+        periodDate: { type: string, format: date }
+        provenance: { $ref: "#/components/schemas/Provenance" }
+        payload: { type: object, additionalProperties: true }
+        documentReference: { type: ["string", "null"] }
+        storedChecksum: { type: ["string", "null"] }
+        isInternal: { type: boolean, default: false }
+        omissionNotes: { type: string }
+    ArchiveSummary:
+      type: object
+      required: [revenue, purchases, hours, receivables, payables, recordCount, internalInvoiceCount, completenessPercent]
+      properties:
+        revenue: { type: number }
+        purchases: { type: number }
+        hours: { type: number }
+        receivables: { type: number }
+        payables: { type: number }
+        recordCount: { type: number }
+        internalInvoiceCount: { type: number }
+        completenessPercent: { type: number }
+    CompletenessStatus:
+      type: object
+      required: [administration, dataType, status, completeFrom, presentFields, missingFields, recordCount]
+      properties:
+        administration: { $ref: "#/components/schemas/Administration" }
+        dataType: { $ref: "#/components/schemas/DataType" }
+        status: { type: string, enum: [complete, partial, not_loaded] }
+        completeFrom: { type: ["string", "null"], format: date }
+        presentFields: { type: array, items: { type: string } }
+        missingFields: { type: array, items: { type: string } }
+        recordCount: { type: number }
+    DocumentIntegrity:
+      type: object
+      required: [recordId, status, documentReference, storedChecksum, checkedAt, message]
+      properties:
+        recordId: { type: number }
+        status: { type: string, enum: [verified, mismatch, unavailable, not_referenced] }
+        documentReference: { type: ["string", "null"] }
+        storedChecksum: { type: ["string", "null"] }
+        actualChecksum: { type: ["string", "null"] }
+        checkedAt: { type: string, format: date-time }
+        message: { type: string }
+    ConsolidationElimination:
+      type: object
+      required: [recordId, invoiceNumber, fromAdministration, toAdministration, amount, reason]
+      properties:
+        recordId: { type: number }
+        invoiceNumber: { type: string }
+        fromAdministration: { $ref: "#/components/schemas/Administration" }
+        toAdministration: { $ref: "#/components/schemas/Administration" }
+        amount: { type: number }
+        reason: { type: string }
+    ConsolidationView:
+      type: object
+      required: [grossRevenue, internalEliminations, consolidatedRevenue, grossPurchases, consolidatedPurchases]
+      properties:
+        grossRevenue: { type: number }
+        internalEliminations: { type: number }
+        consolidatedRevenue: { type: number }
+        grossPurchases: { type: number }
+        consolidatedPurchases: { type: number }
+        eliminations:
+          type: array
+          items: { $ref: "#/components/schemas/ConsolidationElimination" }
 

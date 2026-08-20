@@ -1,0 +1,1 @@
+- [OpenAPI integer compatibility](openapi-integer-compatibility.md) — This workspace's Orval/Zod combination emits unsupported `zod.int()` for OpenAPI `integer` schemas.

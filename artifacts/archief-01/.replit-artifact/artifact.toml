@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "ARCHIEF_01"
+description = "An immutable, read-only administrative archive for five separated administrations, supporting historical search, audit metrics, completeness tracking, internal-invoice elimination visibility, provenance, NAS checksum verification, append-only corrections, and exports."
+version = "1.0.0"
+id = "artifacts/archief-01"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18568
+
+[services.development]
+run = "pnpm --filter @workspace/archief-01 run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/archief-01", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/archief-01/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18568"
+BASE_PATH = "/"
