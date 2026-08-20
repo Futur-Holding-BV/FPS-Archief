@@ -19,7 +19,7 @@ export default function Architecture() {
           </CardHeader>
           <CardContent className="space-y-4 text-sm leading-relaxed text-muted-foreground">
             <p>
-              ARCHIEF_01 operates on a strict Append-Only architectural pattern. Once a payload is ingested into the database, it cannot be modified or deleted. 
+              FPS-Archief operates on a strict Append-Only architectural pattern. Once a payload is ingested into the database, it cannot be modified or deleted. 
             </p>
             <p>
               If a correction is required (e.g. retroactive journal adjustments), a new corrective record must be appended that references the original record ID. Both records remain visible in the audit trail, ensuring complete transparency for retrospective questions.
@@ -35,10 +35,10 @@ export default function Architecture() {
           </CardHeader>
           <CardContent className="space-y-4 text-sm leading-relaxed text-muted-foreground">
             <p>
-              ARCHIEF_01 stores only a relative document reference and SHA-256 checksum. Document bytes stay outside the archive on an operations-managed NAS.
+              FPS-Archief stores only a relative document reference and SHA-256 checksum. Document bytes stay outside the archive on an operations-managed NAS.
             </p>
             <p>
-              When operations supplies a read-only NAS mount, opening a record calculates SHA-256 for the referenced relative file and visibly reports verified, mismatch, unavailable, or not referenced. No NAS credentials or file bytes live in ARCHIEF_01.
+              When operations supplies a read-only NAS mount, opening a record calculates SHA-256 for the referenced relative file and visibly reports verified, mismatch, unavailable, or not referenced. No NAS credentials or file bytes live in FPS-Archief.
             </p>
           </CardContent>
         </Card>

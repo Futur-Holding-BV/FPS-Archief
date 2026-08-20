@@ -1,6 +1,6 @@
 kind = "web"
 previewPath = "/"
-title = "ARCHIEF_01"
+title = "FPS-Archief"
 description = "An immutable, read-only administrative archive for five separated administrations, supporting historical search, audit metrics, completeness tracking, internal-invoice elimination visibility, provenance, NAS checksum verification, append-only corrections, and exports."
 version = "1.0.0"
 id = "artifacts/archief-01"

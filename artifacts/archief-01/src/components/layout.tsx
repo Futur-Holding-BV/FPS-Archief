@@ -21,7 +21,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <div className="h-14 flex items-center px-6 border-b shrink-0">
           <div className="flex items-center gap-2 text-primary font-bold tracking-tight">
             <Database className="w-5 h-5" />
-            <span>ARCHIEF_01</span>
+            <span>FPS-Archief</span>
           </div>
         </div>
         <div className="flex-1 overflow-y-auto py-4">

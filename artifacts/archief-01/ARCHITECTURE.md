@@ -1,8 +1,8 @@
-# ARCHIEF_01 — archive architecture
+# FPS-Archief — archive architecture
 
 ## Purpose and scope
 
-ARCHIEF_01 is an immutable, read-only administrative archive for:
+FPS-Archief is an immutable, read-only administrative archive for:
 
 - FPS Bouw
 - FPS Brandpreventie
@@ -85,12 +85,12 @@ The application stores only a **relative document reference** and its expected S
 
 At record view time:
 
-1. ARCHIEF_01 refuses absolute paths, URL-style values, traversal sequences, and references that resolve outside the configured root.
+1. FPS-Archief refuses absolute paths, URL-style values, traversal sequences, and references that resolve outside the configured root.
 2. If the mount and a safe relative reference are available, the server reads the file, computes SHA-256, and reports `verified` or `mismatch`.
 3. If no mount is configured or the file cannot be read, it reports `unavailable`; it never claims verification.
 4. If a row has no reference/checksum, it reports `not_referenced`.
 
-Credentials, NAS host names, and mounting commands are intentionally not stored in this project. Operations owns the read-only mount; ARCHIEF_01 only consumes the mounted boundary.
+Credentials, NAS host names, and mounting commands are intentionally not stored in this project. Operations owns the read-only mount; FPS-Archief only consumes the mounted boundary.
 
 ## Initial loading boundary
 
